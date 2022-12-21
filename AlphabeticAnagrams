@@ -1,0 +1,72 @@
+import java.math.BigInteger;
+import java.math.*;
+import java.util.*;
+
+public class Anagrams {
+
+  private static Map<Character,Integer> contarDuplicado (char[] letras){
+        Arrays.sort(letras);
+        int contador = 1;
+        Map<Character, Integer> mapa = new HashMap<>();
+        for(char c : letras) {
+            if(mapa.get(c) != null) {
+                contador++;
+                mapa.replace(c, contador);
+            } else {
+                contador = 1;
+                mapa.put(c, contador);
+            }
+        }
+        return mapa;
+    }
+    
+    public static BigInteger listPosition(String word) {
+        BigInteger sum = BigInteger.ONE;
+        word = word.toUpperCase();
+        char[] letras = word.toCharArray();
+        int qtdeLetrasAnterior = 0;
+        for(int i = 0; i < letras.length; i++){
+            for(int j = i+1; j< letras.length; j++) {
+                if(letras[i] > letras[j]) qtdeLetrasAnterior++;
+            }
+            char[] pedacoOrdendado = Arrays.copyOfRange(letras, i, letras.length);
+            Arrays.sort(pedacoOrdendado);
+            int[] contadorRepetidos = contarDuplicado(pedacoOrdendado)
+                    .values()
+                    .stream()
+                    .mapToInt(x -> x)
+                    .toArray();
+            sum = sum.add(BigInteger.valueOf(qtdeLetrasAnterior).multiply(permutacao(pedacoOrdendado.length-1,contadorRepetidos)));
+            qtdeLetrasAnterior = 0;
+        }
+        return sum;
+    }
+    
+    private static BigInteger fatorial(int n) {
+        // --DEFINIÇÃO--
+        // NEGATIVO! => Não tem resultado!
+        // 0! = 1
+        // 1! = 1
+        
+        if(n < 0) throw new IllegalArgumentException("O número não pode ser negativo!");
+        
+        BigInteger resultado = BigInteger.ONE;
+        
+        for(long i = n; i > 1; i--) {
+            resultado = resultado.multiply(BigInteger.valueOf(i));
+        }
+        
+        return resultado;
+    }
+    
+    private static BigInteger permutacao(int n, int... elemRepetido) {
+        BigInteger resultado = fatorial(n);
+         
+        for(int elem : elemRepetido) {
+            resultado = resultado.divide(fatorial(elem));
+        }
+        
+        return resultado;
+    }
+    
+}
